@@ -2,6 +2,7 @@ import random
 import logging
 from typing import Dict
 from power_dialer.database import EventQueue, Agent, StatusEnum, EventTypeEnum
+from peewee import fn
 
 DIAL_RATIO = 2
 
@@ -43,8 +44,8 @@ class PowerDialer:
             connect(self.agent_id, lead_phone_number)
         else:  # redirect call either the agent is in call or logged out
             # Intention Locks for mysql
-            # agent = Agent.select().where(Agent.status == StatusEnum.LOGIN).for_update().first()
-            agent = Agent.select().where(Agent.status == StatusEnum.LOGIN).first()
+            # agent = Agent.select().order_by(fn.Random()).for_update().get()
+            agent = Agent.select().order_by(fn.Random()).get()
             if agent:
                 Agent.update(status=StatusEnum.IN_CALL).where(
                     Agent.agent_id == agent.agent_id
